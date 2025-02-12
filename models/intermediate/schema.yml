@@ -11,8 +11,17 @@ models:
           - relationships:
               to: ref('base_rippling_workers')
               field: worker_id
+          - dbt_expectations.expect_column_value_lengths_to_equal:
+              value: 24
+              row_condition: "{{adapter.quote('WORKER_ID')}} is not null"
+        data_type: varchar
       - name: calculated_annual_salary
         description: "Normalized annual salary based on different compensation frequencies"
+        data_type: number
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 364000
       - name: compensation_frequency
         description: "Type of compensation frequency (HOURLY, WEEKLY, MONTHLY, ANNUALLY)"
       - name: is_current_record
@@ -21,6 +30,137 @@ models:
         description: "Average salary within the department"
       - name: company_avg_salary
         description: "Average salary across the company"
+      - name: department_id
+        data_type: varchar
+        tests:
+          - dbt_expectations.expect_column_value_lengths_to_equal:
+              value: 24
+              row_condition: "{{adapter.quote('DEPARTMENT_ID')}} is not null"
+      - name: job_title
+        data_type: varchar
+        tests:
+          - dbt_expectations.expect_column_value_lengths_to_be_between:
+              min_value: 9
+              max_value: 43
+              row_condition: "{{adapter.quote('JOB_TITLE')}} is not null"
+      - name: compensation_id
+        data_type: varchar
+        tests:
+          - unique
+          - not_null
+          - dbt_expectations.expect_column_value_lengths_to_equal:
+              value: 24
+              row_condition: "{{adapter.quote('COMPENSATION_ID')}} is not null"
+      - name: effective_date
+        data_type: varchar
+        tests:
+          - unique
+          - not_null
+          - dbt_expectations.expect_column_value_lengths_to_equal:
+              value: 32
+              row_condition: "{{adapter.quote('EFFECTIVE_DATE')}} is not null"
+      - name: payment_type
+        data_type: varchar
+        tests:
+          - accepted_values:
+              values:
+                - DEFAULT
+                - VARIED
+          - dbt_expectations.expect_column_value_lengths_to_be_between:
+              min_value: 6
+              max_value: 7
+              row_condition: "{{adapter.quote('PAYMENT_TYPE')}} is not null"
+      - name: previous_salary
+        data_type: number
+        tests:
+          - accepted_values:
+              values:
+                - "0"
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 0
+      - name: salary_change_percentage
+        data_type: number
+        tests:
+          - accepted_values:
+              values:
+                - "0.00"
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 0
+      - name: months_since_last_change
+        data_type: number
+        tests:
+          - accepted_values:
+              values:
+                - "0"
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 0
+      - name: department_comp_quartile
+        data_type: number
+        tests:
+          - accepted_values:
+              values:
+                - "1"
+                - "2"
+                - "3"
+                - "4"
+          - dbt_utils.accepted_range:
+              min_value: 1
+              max_value: 4
+      - name: is_significant_change
+        data_type: boolean
+        tests:
+          - accepted_values:
+              values:
+                - "false"
+      - name: is_due_for_review
+        data_type: boolean
+        tests:
+          - accepted_values:
+              values:
+                - "false"
+      - name: effective_month
+        data_type: date
+      - name: effective_quarter
+        data_type: date
+      - name: effective_year
+        data_type: date
+        tests:
+          - accepted_values:
+              values:
+                - 2023-01-01
+                - 2024-01-01
+                - 2025-01-01
+      - name: dbt_loaded_at
+        data_type: timestamp_ltz
+        tests:
+          - accepted_values:
+              values:
+                - 2025-02-12 14:07:55.787 -0800
+      - name: dbt_batch_id
+        data_type: varchar
+        tests:
+          - accepted_values:
+              values:
+                - 3f1dc5e6-2941-4085-ba77-9b5b7fa85303
+          - dbt_expectations.expect_column_value_lengths_to_equal:
+              value: 36
+              row_condition: "{{adapter.quote('DBT_BATCH_ID')}} is not null"
+    tests:
+      - dbt_utils.recency:
+          field: EFFECTIVE_MONTH
+          datepart: day
+          interval: 56
+      - dbt_utils.recency:
+          field: EFFECTIVE_QUARTER
+          datepart: day
+          interval: 92
+      - dbt_utils.recency:
+          field: EFFECTIVE_YEAR
+          datepart: day
+          interval: 366
 
   - name: int_rippling__worker_leaves
     description: "Processed leave request data with calculated metrics"
@@ -82,4 +222,4 @@ models:
       - name: worker_count
         description: "Number of active workers in the department"
       - name: total_compensation
-        description: "Total compensation for all workers in the department" 
+        description: "Total compensation for all workers in the department"
