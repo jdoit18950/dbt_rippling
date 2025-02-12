@@ -23,11 +23,6 @@ vars:
   # Variables for different environments
   'dbt_date:time_zone': 'America/Los_Angeles'
 
-# Enable metrics
-metrics:
-  northsight:
-    +enabled: true
-
 models:
   northsight:
     # Config defaults for all models
