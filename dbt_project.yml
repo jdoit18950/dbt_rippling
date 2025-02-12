@@ -12,7 +12,6 @@ test-paths: ["tests"]
 seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
-metrics-paths: ["metrics"]
 
 target-path: "target"  # directory which will store compiled SQL files
 clean-targets:         # directories to be removed by `dbt clean`
@@ -26,11 +25,11 @@ vars:
 
 # Enable metrics
 metrics:
-  northsight_analytics:
+  northsight:
     +enabled: true
 
 models:
-  northsight_analytics:
+  northsight:
     # Config defaults for all models
     +materialized: view
     +schema: analytics
@@ -63,4 +62,4 @@ models:
         +tags: ["finance"]
 
 dbt-cloud:
-    project-id: 70471823424662
+  project-id: 70471823424662

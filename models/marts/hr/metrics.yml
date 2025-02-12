@@ -3,46 +3,42 @@ version: 2
 metrics:
   - name: total_headcount
     label: Total Headcount
-    model: ref('hr_headcount_analysis')
+    model: ref('hr_metrics_combined')
+    type: count_distinct
     description: "Total number of employees"
-    calculation_method: count_distinct
-    expression: worker_id
-    timestamp: month_date
-    time_grains: [month, quarter, year]
-    dimensions:
-      - department_name
-      - department_path
+    sql: worker_id
+    meta:
+      dimension:
+        - department_name
+        - department_path
 
   - name: average_salary
     label: Average Salary
-    model: ref('hr_compensation_analysis')
+    model: ref('hr_metrics_combined')
+    type: average
     description: "Average annual salary"
-    calculation_method: average
-    expression: calculated_annual_salary
-    timestamp: effective_date
-    time_grains: [month, quarter, year]
-    dimensions:
-      - department_name
-      - job_title
+    sql: calculated_annual_salary
+    meta:
+      dimension:
+        - department_name
+        - job_title
 
   - name: turnover_rate
     label: Turnover Rate
-    model: ref('hr_turnover_analysis')
+    model: ref('hr_metrics_combined')
+    type: expression
     description: "Employee turnover rate as a percentage"
-    calculation_method: derived
-    expression: "100.0 * terminations / NULLIF(total_employees, 0)"
-    timestamp: month_date
-    time_grains: [month, quarter, year]
-    dimensions:
-      - department_name
+    sql: "100.0 * terminations / NULLIF(total_employees, 0)"
+    meta:
+      dimension:
+        - department_name
 
   - name: total_personnel_cost
     label: Total Personnel Cost
-    model: ref('hr_department_cost_analysis')
+    model: ref('hr_metrics_combined')
+    type: sum
     description: "Total monthly personnel cost including salary, benefits, and overtime"
-    calculation_method: sum
-    expression: total_monthly_cost
-    timestamp: month_date
-    time_grains: [month, quarter, year]
-    dimensions:
-      - department_name 
+    sql: total_monthly_cost
+    meta:
+      dimension:
+        - department_name
