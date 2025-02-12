@@ -63,3 +63,49 @@ sources:
               - relationships:
                   to: source('rippling', 'workers')
                   field: id
+      - name: leave_requests
+        description: "Employee leave requests from Rippling"
+        loaded_at_field: "created_at"
+        freshness:
+          warn_after: {count: 24, period: hour}
+          error_after: {count: 48, period: hour}
+        columns:
+          - name: id
+            description: "Unique identifier for the leave request"
+            tests:
+              - unique
+              - not_null
+          - name: leave_type_id
+            description: "ID of the leave type"
+            tests:
+              - not_null
+          - name: status
+            description: "Status of the leave request"
+            tests:
+              - accepted_values:
+                  values: ['PENDING', 'APPROVED', 'REJECTED', 'CANCELED']
+          - name: start_date
+            description: "Start date of the leave"
+            tests:
+              - not_null
+          - name: end_date
+            description: "End date of the leave"
+            tests:
+              - not_null
+      
+      - name: leave_types
+        description: "Types of leave available in the system"
+        columns:
+          - name: id
+            description: "Unique identifier for the leave type"
+            tests:
+              - unique
+              - not_null
+          - name: name
+            description: "Name of the leave type"
+            tests:
+              - not_null
+          - name: is_paid
+            description: "Whether this is a paid leave type"
+            tests:
+              - not_null
