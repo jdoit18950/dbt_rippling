@@ -1,9 +1,9 @@
-name: "northsight"
+name: "northsight_analytics"
 version: "1.0.0"
 config-version: 2
 
 # This setting configures which "profile" dbt uses for this project.
-profile: "northsight"
+profile: "northsight_analytics"
 
 # File path configurations
 model-paths: ["models"]
@@ -56,4 +56,5 @@ models:
         +schema: finance
         +tags: ["finance"]
 dbt-cloud:
-    project-id: 70471823424662
+  project-id: 70471823424662
+
