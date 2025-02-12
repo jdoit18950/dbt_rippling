@@ -24,7 +24,7 @@ vars:
   'dbt_date:time_zone': 'America/Los_Angeles'
 
 models:
-  rippling_analytics:
+  northsight_analytics:
     # Config defaults for all models
     +materialized: view
     +schema: analytics
