@@ -1,0 +1,85 @@
+version: 2
+
+models:
+  - name: int_rippling__worker_compensation
+    description: "Standardized worker compensation data with historical tracking"
+    columns:
+      - name: worker_id
+        description: "Foreign key to workers table"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('base_rippling_workers')
+              field: worker_id
+      - name: calculated_annual_salary
+        description: "Normalized annual salary based on different compensation frequencies"
+      - name: compensation_frequency
+        description: "Type of compensation frequency (HOURLY, WEEKLY, MONTHLY, ANNUALLY)"
+      - name: is_current_record
+        description: "Flag indicating if this is the current compensation record"
+      - name: dept_avg_salary
+        description: "Average salary within the department"
+      - name: company_avg_salary
+        description: "Average salary across the company"
+
+  - name: int_rippling__worker_leaves
+    description: "Processed leave request data with calculated metrics"
+    columns:
+      - name: leave_request_id
+        description: "Unique identifier for the leave request"
+        tests:
+          - unique
+          - not_null
+      - name: worker_id
+        description: "Foreign key to workers table"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('base_rippling_workers')
+              field: worker_id
+      - name: leave_duration_days
+        description: "Duration of leave in days"
+      - name: total_leave_days_ytd
+        description: "Total leave days taken year to date"
+      - name: paid_leave_days_ytd
+        description: "Total paid leave days taken year to date"
+
+  - name: int_rippling__worker_time_entries
+    description: "Processed time entry data with calculated metrics"
+    columns:
+      - name: time_entry_id
+        description: "Unique identifier for the time entry"
+        tests:
+          - unique
+          - not_null
+      - name: worker_id
+        description: "Foreign key to workers table"
+        tests:
+          - relationships:
+              to: ref('base_rippling_workers')
+              field: worker_id
+      - name: regular_hours
+        description: "Regular working hours (up to 8 hours per day)"
+      - name: overtime_hours
+        description: "Overtime hours (beyond 8 hours per day)"
+      - name: cumulative_hours_mtd
+        description: "Cumulative hours worked month to date"
+
+  - name: int_rippling__department_hierarchy
+    description: "Department hierarchy with recursive path calculation"
+    columns:
+      - name: department_id
+        description: "Unique identifier for the department"
+        tests:
+          - unique
+          - not_null
+      - name: department_path
+        description: "Full hierarchical path of the department"
+        tests:
+          - not_null
+      - name: hierarchy_level
+        description: "Level in the department hierarchy (1 being top level)"
+      - name: worker_count
+        description: "Number of active workers in the department"
+      - name: total_compensation
+        description: "Total compensation for all workers in the department" 
