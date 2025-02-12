@@ -1,4 +1,4 @@
-name: "northsight"
+name: "northsight_analytics"
 version: "1.0.0"
 config-version: 2
 
@@ -24,7 +24,7 @@ vars:
   'dbt_date:time_zone': 'America/Los_Angeles'
 
 models:
-  northsight:
+  rippling_analytics:
     # Config defaults for all models
     +materialized: view
     +schema: analytics
@@ -55,11 +55,6 @@ models:
       finance:
         +schema: finance
         +tags: ["finance"]
-<<<<<<< HEAD
-
 dbt-cloud:
   project-id: 70471823424662
-=======
-dbt-cloud:
-    project-id: 70471823424662
->>>>>>> f41e11c00cdfbb0862a3ef331010c0f672ae1e23
+
