@@ -17,19 +17,21 @@ WITH worker_base AS (
     payment_type,
     LAG(calculated_annual_salary) OVER (PARTITION BY worker_id ORDER BY created_at NULLS FIRST) AS previous_salary,
     CASE
-      WHEN previous_salary IS NOT NULL AND previous_salary <> 0
+      WHEN NOT previous_salary IS NULL AND previous_salary <> 0
       THEN ROUND(
         (
-          (calculated_annual_salary - previous_salary) / previous_salary
+          (
+            calculated_annual_salary - previous_salary
+          ) / previous_salary
         ) * 100,
         2
       )
       ELSE 0
     END AS salary_change_percentage,
     DATEDIFF(
-      'month',
+      CREATED_AT,
       LAG(created_at) OVER (PARTITION BY worker_id ORDER BY created_at NULLS FIRST),
-      created_at
+      'month'
     ) AS months_since_last_change
   FROM compensation_data
 ), annualized_compensation AS (
@@ -58,12 +60,13 @@ WITH worker_base AS (
     department_comp_quartile,
     is_significant_change,
     is_due_for_review,
-    DATE_TRUNC('MONTH', effective_date::DATE) AS effective_month,
-    DATE_TRUNC('QUARTER', effective_date::DATE) AS effective_quarter,
-    DATE_TRUNC('YEAR', effective_date::DATE) AS effective_year,
+    DATE_TRUNC('MONTH', CAST(effective_date AS DATE)) AS effective_month,
+    DATE_TRUNC('QUARTER', CAST(effective_date AS DATE)) AS effective_quarter,
+    DATE_TRUNC('YEAR', CAST(effective_date AS DATE)) AS effective_year,
     CURRENT_TIMESTAMP() AS dbt_loaded_at,
     '3f1dc5e6-2941-4085-ba77-9b5b7fa85303' AS dbt_batch_id
   FROM annualized_compensation
 )
-SELECT *
+SELECT
+  *
 FROM final
