@@ -1,0 +1,17 @@
+version: 2
+sources:
+  - name: human_resources
+    database: HR_ANALYTICS
+    schema: HR_RAW
+    tables:
+      - name: workers
+      - name: compensations
+      - name: departments
+      - name: employment_types
+      - name: leave_balances
+      - name: leave_requests
+      - name: time_entries
+      - name: job_codes
+      - name: teams
+      - name: leave_days
+
