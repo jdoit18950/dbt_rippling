@@ -1,0 +1,145 @@
+version: 2
+
+models:
+  - name: int_rippling__worker_leaves
+    description: "Standardized and enriched leave request data"
+    columns:
+      - name: leave_request_id
+        description: "Unique identifier for the leave request"
+        tests:
+          - unique
+          - not_null
+      - name: worker_id
+        description: "Foreign key to workers table"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('base_rippling_workers')
+              field: worker_id
+      - name: department_id
+        description: "Department identifier"
+        tests:
+          - relationships:
+              to: ref('base_rippling_departments')
+              field: department_id
+      - name: leave_type_name
+        description: "Name of the leave type"
+      - name: is_paid_leave
+        description: "Flag indicating if this is a paid leave"
+      - name: leave_status
+        description: "Status of the leave request"
+        tests:
+          - accepted_values:
+              values: ['PENDING', 'APPROVED', 'REJECTED', 'CANCELED']
+      - name: start_date
+        description: "Start date of the leave"
+        tests:
+          - not_null
+      - name: end_date
+        description: "End date of the leave"
+        tests:
+          - not_null
+      - name: leave_duration_days
+        description: "Duration of leave in days"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+
+  - name: int_rippling__worker_compensation
+    description: "Standardized worker compensation data with historical tracking"
+    columns:
+      - name: worker_id
+        description: "Foreign key to workers table"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('base_rippling_workers')
+              field: worker_id
+      - name: department_id
+        description: "Department identifier"
+        tests:
+          - relationships:
+              to: ref('base_rippling_departments')
+              field: department_id
+      - name: calculated_annual_salary
+        description: "Normalized annual salary"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: compensation_frequency
+        description: "Type of compensation frequency"
+        tests:
+          - accepted_values:
+              values: ['HOURLY', 'WEEKLY', 'MONTHLY', 'ANNUALLY']
+      - name: is_current_record
+        description: "Flag indicating if this is the current compensation record"
+
+  - name: int_rippling__worker_time_entries
+    description: "Processed time entry data with calculated metrics"
+    columns:
+      - name: time_entry_id
+        description: "Unique identifier for the time entry"
+        tests:
+          - unique
+          - not_null
+      - name: worker_id
+        description: "Foreign key to workers table"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('base_rippling_workers')
+              field: worker_id
+      - name: department_id
+        description: "Department identifier"
+      - name: calculated_hours
+        description: "Total hours for the entry"
+      - name: regular_hours
+        description: "Regular working hours (up to 8 hours)"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 8
+      - name: overtime_hours
+        description: "Overtime hours (beyond 8 hours)"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+
+  - name: int_rippling__department_hierarchy
+    description: "Department hierarchy with recursive path calculation"
+    columns:
+      - name: department_id
+        description: "Unique identifier for the department"
+        tests:
+          - unique
+          - not_null
+      - name: parent_department_id
+        description: "ID of the parent department"
+        tests:
+          - relationships:
+              to: ref('base_rippling_departments')
+              field: department_id
+      - name: department_name
+        description: "Name of the department"
+        tests:
+          - not_null
+      - name: hierarchy_level
+        description: "Level in the department hierarchy (1 being top level)"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 1
+      - name: department_path
+        description: "Full hierarchical path of department names"
+        tests:
+          - not_null
+      - name: worker_count
+        description: "Number of active workers in the department"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: total_compensation
+        description: "Total compensation for all workers in the department"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
