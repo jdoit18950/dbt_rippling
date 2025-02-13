@@ -1,55 +1,33 @@
-name: "northsight_analytics"
+name: "hr_analytics"
 version: "1.0.0"
 config-version: 2
 
-# This setting configures which "profile" dbt uses for this project.
-profile: "northsight_analytics"
+profile: "hr_analytics"
 
-# File path configurations
 model-paths: ["models"]
-analysis-paths: ["analyses"]
 test-paths: ["tests"]
 seed-paths: ["seeds"]
 macro-paths: ["macros"]
-snapshot-paths: ["snapshots"]
-
-target-path: "target"  # directory which will store compiled SQL files
-clean-targets:         # directories to be removed by `dbt clean`
+target-path: "target"
+clean-targets:
   - "target"
-  - "dbt_packages"
-  - "logs"
-
-vars:
-  # Variables for different environments
-  'dbt_date:time_zone': 'America/Los_Angeles'
+  - "dbt_modules"
 
 models:
-  northsight_analytics:
-    # Config defaults for all models
-    +materialized: view
-    +schema: analytics
-    
+  hr_analytics:
     staging:
+      +schema: transformed # Dynamically sets schema based on environment
       +materialized: view
-      +schema: staging
-      +tags: ["staging", "hourly"]
-    
     intermediate:
-      +materialized: ephemeral
       +schema: intermediate
-      +tags: ["intermediate"]
-    
-    marts:
       +materialized: table
-      hr:
-        +schema: hr_analytics
-        +tags: ['hr', 'attrition']
-      finance:
-        +schema: finance_analytics
-        +tags: ['finance']
-      core:
-        +schema: core
-        +tags: ['core']
-dbt-cloud:
-  project-id: 70471823424662
+    dimensions:
+      +schema: analysis
+      +materialized: table
+    facts:
+      +schema: analysis
+      +materialized: table
+    metrics:
+      +schema: analysis
+      +materialized: view
 
