@@ -39,10 +39,6 @@ renamed as (
         -- External system flag
         is_managed_by_external_system,
         
-        -- Timestamps
-        created_at,
-        updated_at,
-        
         -- Add loaded timestamp
         current_timestamp() as dbt_loaded_at
 
