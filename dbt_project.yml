@@ -41,20 +41,15 @@ models:
     
     marts:
       +materialized: table
-      +schema: marts
-      +tags: ["marts"]
-      
+      hr:
+        +schema: hr_analytics
+        +tags: ['hr', 'attrition']
+      finance:
+        +schema: finance_analytics
+        +tags: ['finance']
       core:
         +schema: core
-        +tags: ["core"]
-      
-      hr:
-        +schema: hr
-        +tags: ["hr"]
-      
-      finance:
-        +schema: finance
-        +tags: ["finance"]
+        +tags: ['core']
 dbt-cloud:
   project-id: 70471823424662
 

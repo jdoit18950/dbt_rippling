@@ -1,0 +1,173 @@
+version: 2
+
+models:
+  - name: fct_employee_attrition
+    description: "Monthly employee attrition metrics and turnover analysis by department"
+    columns:
+      - name: department_id
+        description: "Department identifier"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('int_rippling__department_hierarchy')
+              field: department_id
+      - name: month_date
+        description: "Analysis month"
+        tests:
+          - not_null
+      - name: total_employees
+        description: "Total number of employees in the month"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: active_employees
+        description: "Number of active employees at month end"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: terminations
+        description: "Number of terminations in the month"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: new_hires
+        description: "Number of new hires in the month"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: avg_tenure_days
+        description: "Average tenure in days"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: monthly_turnover_rate
+        description: "Monthly turnover rate as percentage"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      - name: monthly_hire_rate
+        description: "Monthly hire rate as percentage"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      - name: retention_rate
+        description: "Employee retention rate as percentage"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      - name: rolling_12_month_turnover_rate
+        description: "12-month rolling average turnover rate"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+
+  - name: fct_employee_lifecycle
+    description: "Employee lifecycle analysis with tenure bands and attrition risk assessment"
+    columns:
+      - name: worker_id
+        description: "Unique identifier for the employee"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('base_rippling_workers')
+              field: worker_id
+      - name: department_id
+        description: "Department identifier"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('int_rippling__department_hierarchy')
+              field: department_id
+      - name: months_of_service
+        description: "Total months of service"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: tenure_band
+        description: "Employee tenure category"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['New Hire (< 3 months)', '3-12 months', '1-2 years', '2-5 years', '5+ years']
+      - name: attrition_risk
+        description: "Calculated attrition risk level"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['High', 'Medium', 'Low']
+
+  - name: fct_department_attrition_analysis
+    description: "Department-level attrition analysis with year-over-year comparisons"
+    columns:
+      - name: department_id
+        description: "Department identifier"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('int_rippling__department_hierarchy')
+              field: department_id
+      - name: month_date
+        description: "Analysis month"
+        tests:
+          - not_null
+      - name: terminations
+        description: "Number of terminations"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: total_headcount
+        description: "Total department headcount"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: avg_salary
+        description: "Average salary in department"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: yoy_growth_rate
+        description: "Year-over-year headcount growth rate"
+      - name: yoy_attrition_change
+        description: "Year-over-year change in attrition rate"
+
+  - name: fct_compensation_attrition_analysis
+    description: "Analysis of attrition patterns by compensation bands"
+    columns:
+      - name: department_id
+        description: "Department identifier"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('int_rippling__department_hierarchy')
+              field: department_id
+      - name: salary_quartile
+        description: "Salary quartile (1-4)"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1
+              max_value: 4
+      - name: total_employees
+        description: "Total employees in salary band"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: terminations
+        description: "Number of terminations in salary band"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+      - name: attrition_rate_by_band
+        description: "Attrition rate for salary band"
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100 
