@@ -1,0 +1,37 @@
+version: 2
+
+models:
+  - name: dim_employees
+    description: "Employee dimension table containing current and historical employee records"
+    columns:
+      - name: worker_id
+        description: "Primary key for the employee dimension"
+        tests:
+          - unique
+          - not_null
+      - name: department_id
+        tests:
+          - relationships:
+              to: ref('dim_departments')
+              field: department_id
+
+  - name: dim_departments
+    columns:
+      - name: department_id
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_employment_types
+    columns:
+      - name: employment_type_id
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_job_codes
+    columns:
+      - name: job_code_id
+        tests:
+          - unique
+          - not_null
