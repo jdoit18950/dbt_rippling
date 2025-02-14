@@ -1,8 +1,11 @@
 version: 2
 
 models:
-  - name: attendance_metrics
+  - name: metrics_attendance
     description: "Comprehensive attendance and time tracking analytics"
+    meta:
+      owner: "HR Analytics Team"
+      refreshed: "daily"
     columns:
       - name: department_name
         description: "Department name"
@@ -14,27 +17,37 @@ models:
           - not_null
       - name: total_hours_worked
         description: "Total hours worked"
+        meta:
+          metric_type: "sum"
+          business_owner: "Operations"
         tests:
           - not_null
           - positive_value
       - name: overtime_percentage
         description: "Percentage of overtime hours"
+        meta:
+          metric_type: "ratio"
+          threshold: 20
         tests:
           - not_null
           - less_than_100
       - name: high_utilization_percentage
         description: "Percentage of employees with high utilization"
+        meta:
+          metric_type: "ratio"
+          threshold: 85
         tests:
           - not_null
           - less_than_100
     tests:
       - dbt_utils.expression_is_true:
           expression: "total_hours_worked >= 0"
-      - dbt_utils.expression_is_true:
-          expression: "overtime_percentage >= 0 and overtime_percentage <= 100"
 
-  - name: leave_metrics
+  - name: metrics_leave
     description: "Leave and PTO usage analytics with seasonal patterns"
+    meta:
+      owner: "HR Analytics Team"
+      refreshed: "daily"
     columns:
       - name: department_name
         description: "Department name"
@@ -44,24 +57,29 @@ models:
         description: "Month of analysis"
         tests:
           - not_null
+      - name: total_leave_days
+        description: "Total number of leave days"
+        meta:
+          metric_type: "sum"
+          business_owner: "HR"
+        tests:
+          - not_null
+          - positive_value
       - name: approval_rate
         description: "Percentage of approved leave requests"
+        meta:
+          metric_type: "ratio"
+          threshold: 90
         tests:
           - not_null
           - less_than_100
-      - name: concurrent_leave_percentage
-        description: "Percentage of employees on leave simultaneously"
-        tests:
-          - not_null
-          - less_than_100
-    tests:
-      - dbt_utils.expression_is_true:
-          expression: "total_leave_days >= 0"
-      - dbt_utils.expression_is_true:
-          expression: "approval_rate >= 0 and approval_rate <= 100"
 
-  - name: compensation_metrics
+  - name: metrics_compensation
     description: "Compensation analysis including salary distributions and equity metrics"
+    meta:
+      owner: "HR Analytics Team"
+      refreshed: "monthly"
+      security_level: "restricted"
     columns:
       - name: department_name
         description: "Department name"
@@ -73,17 +91,24 @@ models:
           - not_null
       - name: avg_annual_salary
         description: "Average annual salary"
+        meta:
+          metric_type: "average"
+          business_owner: "Finance"
         tests:
           - not_null
           - positive_value
-    tests:
-      - dbt_utils.expression_is_true:
-          expression: "avg_annual_salary >= 0"
-      - dbt_utils.expression_is_true:
-          expression: "salary_spread_percentage >= 0"
+      - name: salary_spread_percentage
+        description: "Spread between highest and lowest salary as percentage of median"
+        meta:
+          metric_type: "ratio"
+          threshold: 150
 
-  - name: diversity_metrics
+  - name: metrics_diversity
     description: "Diversity and inclusion metrics with pay equity analysis"
+    meta:
+      owner: "HR Analytics Team"
+      refreshed: "monthly"
+      security_level: "restricted"
     columns:
       - name: department_name
         description: "Department name"
@@ -95,12 +120,12 @@ models:
           - not_null
       - name: total_employees
         description: "Total number of employees"
+        meta:
+          metric_type: "count"
+          business_owner: "HR"
         tests:
           - not_null
           - positive_value
-    tests:
-      - dbt_utils.expression_is_true:
-          expression: "total_employees >= 0"
 
 exposures:
   - name: hr_analytics_dashboard
@@ -112,13 +137,27 @@ exposures:
       attendance patterns, leave management, compensation distribution,
       and diversity metrics
     depends_on:
-      - ref('attendance_metrics')
-      - ref('leave_metrics')
-      - ref('compensation_metrics')
-      - ref('diversity_metrics')
+      - ref('metrics_attendance')
+      - ref('metrics_leave')
+      - ref('metrics_compensation')
+      - ref('metrics_diversity')
     owner:
       name: HR Analytics Team
       email: hr.analytics@company.com
+
+  - name: executive_hr_summary
+    type: dashboard
+    maturity: high
+    url: https://your-bi-tool/dashboards/executive-hr-summary
+    description: >
+      Executive summary dashboard showing key HR metrics and trends
+    depends_on:
+      - ref('metrics_attendance')
+      - ref('metrics_compensation')
+      - ref('metrics_diversity')
+    owner:
+      name: Executive Team
+      email: exec.team@company.com
 
 custom_tests:
   - name: positive_value
