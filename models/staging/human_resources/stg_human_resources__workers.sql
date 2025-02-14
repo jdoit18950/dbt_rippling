@@ -13,6 +13,8 @@ renamed as (
         id AS worker_id,
         user:id::STRING AS user_id,
         user:display_name::STRING AS display_name,
+        gender,
+        ethnicity,
         user:work_email::STRING AS work_email,
         department:id::STRING AS department_id,
         employment_type:id::STRING AS employment_type_id,

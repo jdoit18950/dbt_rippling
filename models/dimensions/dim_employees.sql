@@ -37,6 +37,8 @@ final AS (
         -- Employee Details
         w.status AS employee_status,
         w.date_of_birth,
+        w.gender,
+        w.ethnicity,
         et.type AS employment_type,
         et.name AS employment_type_name,
         d.department_name,

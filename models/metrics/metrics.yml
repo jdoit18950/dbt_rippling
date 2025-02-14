@@ -1,0 +1,142 @@
+version: 2
+
+models:
+  - name: attendance_metrics
+    description: "Comprehensive attendance and time tracking analytics"
+    columns:
+      - name: department_name
+        description: "Department name"
+        tests:
+          - not_null
+      - name: analysis_month
+        description: "Month of analysis"
+        tests:
+          - not_null
+      - name: total_hours_worked
+        description: "Total hours worked"
+        tests:
+          - not_null
+          - positive_value
+      - name: overtime_percentage
+        description: "Percentage of overtime hours"
+        tests:
+          - not_null
+          - less_than_100
+      - name: high_utilization_percentage
+        description: "Percentage of employees with high utilization"
+        tests:
+          - not_null
+          - less_than_100
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "total_hours_worked >= 0"
+      - dbt_utils.expression_is_true:
+          expression: "overtime_percentage >= 0 and overtime_percentage <= 100"
+
+  - name: leave_metrics
+    description: "Leave and PTO usage analytics with seasonal patterns"
+    columns:
+      - name: department_name
+        description: "Department name"
+        tests:
+          - not_null
+      - name: analysis_month
+        description: "Month of analysis"
+        tests:
+          - not_null
+      - name: approval_rate
+        description: "Percentage of approved leave requests"
+        tests:
+          - not_null
+          - less_than_100
+      - name: concurrent_leave_percentage
+        description: "Percentage of employees on leave simultaneously"
+        tests:
+          - not_null
+          - less_than_100
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "total_leave_days >= 0"
+      - dbt_utils.expression_is_true:
+          expression: "approval_rate >= 0 and approval_rate <= 100"
+
+  - name: compensation_metrics
+    description: "Compensation analysis including salary distributions and equity metrics"
+    columns:
+      - name: department_name
+        description: "Department name"
+        tests:
+          - not_null
+      - name: analysis_month
+        description: "Month of analysis"
+        tests:
+          - not_null
+      - name: avg_annual_salary
+        description: "Average annual salary"
+        tests:
+          - not_null
+          - positive_value
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "avg_annual_salary >= 0"
+      - dbt_utils.expression_is_true:
+          expression: "salary_spread_percentage >= 0"
+
+  - name: diversity_metrics
+    description: "Diversity and inclusion metrics with pay equity analysis"
+    columns:
+      - name: department_name
+        description: "Department name"
+        tests:
+          - not_null
+      - name: analysis_month
+        description: "Month of analysis"
+        tests:
+          - not_null
+      - name: total_employees
+        description: "Total number of employees"
+        tests:
+          - not_null
+          - positive_value
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "total_employees >= 0"
+
+exposures:
+  - name: hr_analytics_dashboard
+    type: dashboard
+    maturity: high
+    url: https://your-bi-tool/dashboards/hr-analytics
+    description: >
+      HR Analytics Dashboard showing comprehensive workforce metrics including
+      attendance patterns, leave management, compensation distribution,
+      and diversity metrics
+    depends_on:
+      - ref('attendance_metrics')
+      - ref('leave_metrics')
+      - ref('compensation_metrics')
+      - ref('diversity_metrics')
+    owner:
+      name: HR Analytics Team
+      email: hr.analytics@company.com
+
+custom_tests:
+  - name: positive_value
+    description: "Ensures that a column's values are positive"
+    tests:
+      - generic:
+          name: positive_value
+          config:
+            field: "{{ column_name }}"
+            compare_to: 0
+            operator: ">="
+
+  - name: less_than_100
+    description: "Ensures that a percentage column is less than or equal to 100"
+    tests:
+      - generic:
+          name: less_than_100
+          config:
+            field: "{{ column_name }}"
+            compare_to: 100
+            operator: "<="

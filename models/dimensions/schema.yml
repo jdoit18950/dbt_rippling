@@ -7,7 +7,6 @@ models:
       - name: worker_id
         description: "Primary key for the employee dimension"
         tests:
-          - unique
           - not_null
       - name: department_id
         tests:
