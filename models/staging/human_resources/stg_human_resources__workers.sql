@@ -17,6 +17,8 @@ renamed as (
         department:id::STRING AS department_id,
         employment_type:id::STRING AS employment_type_id,
         teams:id AS team_ids,
+        created_at::TIMESTAMP AS created_at,
+        updated_at::TIMESTAMP AS updated_at,
 
         -- Employment Details
         employment_type:label::STRING AS employment_type_label,

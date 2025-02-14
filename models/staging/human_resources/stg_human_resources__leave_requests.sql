@@ -33,6 +33,8 @@ select
         -- Additional Leave Info
         number_of_minutes_requested::INT AS total_minutes_requested,
         is_managed_by_external_system::BOOLEAN AS managed_by_external_system,
+        created_at::TIMESTAMP AS created_at,
+        updated_at::TIMESTAMP AS updated_at,
 
     from source
 

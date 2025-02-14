@@ -50,6 +50,8 @@ final AS (
         total_hours_worked / NULLIF(paid_hours, 0) AS utilization_rate,
         
         -- Metadata
+        te.created_at,
+        te.updated_at,
         CURRENT_TIMESTAMP() AS _loaded_at
         
     FROM time_entries te

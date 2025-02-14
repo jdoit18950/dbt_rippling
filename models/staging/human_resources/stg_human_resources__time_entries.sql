@@ -15,6 +15,8 @@ renamed as (
         start_time::TIMESTAMP AS start_time,
         end_time::TIMESTAMP AS end_time,
         status::STRING AS entry_status,
+        created_at::TIMESTAMP AS created_at,
+        updated_at::TIMESTAMP AS updated_at,
 
         -- Expanded Time Card Fields
         time_card:id::STRING AS time_card_id,
