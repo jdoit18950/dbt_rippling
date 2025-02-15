@@ -29,10 +29,8 @@ with
             ) as total_paid_time_off_hours,
             to_double(
                 time_card:summary.total_unpaid_time_off_hours
-            ) as total_unpaid_time_off_hours,
-            created_at,
-            updated_at
-
+            ) as total_unpaid_time_off_hours
+            
         from source
 
     )
