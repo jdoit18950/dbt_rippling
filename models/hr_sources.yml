@@ -14,4 +14,15 @@ sources:
       - name: job_codes
       - name: teams
       - name: leave_days
-
+      
+  - name: ringcentral
+    database: PC_FIVETRAN_DB
+    schema: RINGCENTRAL
+    tables:
+      - name: account_call_log
+      - name: account_call_log_leg
+      - name: call_log
+      - name: users
+      - name: deparment
+      - name: phone_numbers
+      - name: call_queues
